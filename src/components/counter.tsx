@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useCounter } from "@/lib/counter-context";
 
 export default function Counter() {
-  const { amount, incrementCounter } = useCounter();
+  const { amount, debouncedIncrement } = useCounter();
 
   return (
     <>
@@ -14,7 +14,7 @@ export default function Counter() {
       </h2>
       <Button
         size="lg"
-        onClick={incrementCounter}
+        onClick={debouncedIncrement}
         className="bg-[url(/wood.webp)] bg-cover bg-center text-white"
       >
         Wypłaszcz

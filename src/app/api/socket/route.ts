@@ -1,39 +1,55 @@
 // src/app/api/socket/route.ts
-import { NextResponse } from "next/server";
 import { db } from "@/server/db";
 import { days } from "@/server/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { pusherServer } from "@/lib/pusher-server";
 
 type RequestBody = {
   action: string;
 };
 
+function today() {
+  return new Date().toISOString().split("T")[0];
+}
+
+// api/socket/route.ts
 export async function POST(req: Request) {
-  const body = (await req.json()) as RequestBody;
-  const { action } = body;
+  try {
+    const { action } = (await req.json()) as RequestBody;
 
-  if (action === "increment") {
-    const today = new Date().toISOString().split("T")[0]!;
-    const day = await db.query.days.findFirst({
-      where: (days, { eq }) => eq(days.date, today),
-    });
+    if (action === "increment") {
+      // Use a more efficient update query
+      const result = await db.transaction(async (tx) => {
+        // Update and return the new value in a single operation
+        const [updated] = await tx
+          .update(days)
+          .set({
+            amount: sql`amount
+                        + 1`,
+          })
+          .where(eq(days.date, today()!))
+          .returning({ amount: days.amount });
 
-    if (day) {
-      const newAmount = day.amount + 1;
-      await db
-        .update(days)
-        .set({ amount: newAmount })
-        .where(eq(days.date, today));
-
-      // Broadcast the update via Pusher
-      await pusherServer.trigger("counter-channel", "counter-update", {
-        amount: newAmount,
+        return updated;
       });
 
-      return NextResponse.json({ success: true, amount: newAmount });
-    }
-  }
+      // Send only the updated value to Pusher
+      await pusherServer.trigger("counter-channel", "counter-update", {
+        amount: result?.amount,
+      });
 
-  return NextResponse.json({ success: false });
+      return Response.json({ success: true, amount: result?.amount });
+    }
+
+    return Response.json(
+      { success: false, error: "Invalid action" },
+      { status: 400 },
+    );
+  } catch (error) {
+    console.error(error);
+    return Response.json(
+      { success: false, error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }
