@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="pl" className={GeistSans.variable} suppressHydrationWarning>
       <head />
-      <body className="min-h-screen bg-background font-sans antialiased">
+      <body className="flex min-h-screen flex-col items-center justify-between bg-background font-sans antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -27,6 +27,16 @@ export default function RootLayout({
           enableColorScheme={true} // Explicitly enable color scheme
         >
           {children}
+          <footer className="w-full border-t-2 p-4 text-center">
+            Built by Jakub Rudnik. Source code on{" "}
+            <a
+              className="font-medium text-primary underline underline-offset-4"
+              href="https://github.com/Jakub-Rudnik/flatoinator3000"
+              target="_blank"
+            >
+              github
+            </a>
+          </footer>
         </ThemeProvider>
       </body>
     </html>
