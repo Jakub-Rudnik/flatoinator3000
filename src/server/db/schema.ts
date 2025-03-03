@@ -10,6 +10,17 @@ import {date, integer, pgTableCreator, timestamp} from "drizzle-orm/pg-core";
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
+
+export type day =
+  | {
+      id: number;
+      date: string;
+      amount: number;
+      createdAt: Date | null;
+      updatedAt: Date;
+    }
+  | undefined;
+
 export const createTable = pgTableCreator((name) => `flatoinator3000_${name}`);
 
 export const days = createTable("days", {
