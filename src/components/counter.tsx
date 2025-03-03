@@ -41,10 +41,16 @@ export default function Counter({ initialAmount }: CounterProps) {
 
   return (
     <>
-      <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+      <h2 className="scroll-m-20 pb-2 text-5xl font-semibold tracking-tight first:mt-0">
         {amount}
       </h2>
-      <Button onClick={handleClick}>Wypłaszcz</Button>
+      <Button
+        size="lg"
+        onClick={handleClick}
+        className="bg-[url(/wood.webp)] bg-cover bg-center text-white"
+      >
+        Wypłaszcz
+      </Button>
     </>
   );
 }
