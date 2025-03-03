@@ -5,8 +5,12 @@ import { days } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 import { pusherServer } from "@/lib/pusher-server";
 
+type RequestBody = {
+  action: string;
+};
+
 export async function POST(req: Request) {
-  const body = await req.json();
+  const body = (await req.json()) as RequestBody;
   const { action } = body;
 
   if (action === "increment") {
