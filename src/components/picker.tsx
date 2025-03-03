@@ -1,10 +1,11 @@
 "use client";
 
 import { Calendar } from "@/components/ui/calendar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { day } from "@/server/db/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatLocalDate } from "@/lib/utils";
+import { useCounter } from "@/lib/counter-context";
 
 export type PickerProps = {
   occurrences: day[];
@@ -12,21 +13,38 @@ export type PickerProps = {
 
 export default function Picker({ occurrences }: PickerProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [amount, setAmount] = useState<number | undefined>(findAmount(date));
+  const [amount, setAmount] = useState<number>(0);
+  const { amount: todayAmount } = useCounter();
 
-  function findAmount(date: Date | undefined) {
-    const selectedDate = formatLocalDate(date!);
+  useEffect(() => {
+    if (date) {
+      // If today's date is selected, use the shared counter value
+      const todayDate = formatLocalDate(new Date());
+      const selectedDate = formatLocalDate(date);
+
+      if (selectedDate === todayDate) {
+        setAmount(todayAmount);
+      } else {
+        const newAmount = findAmount(date);
+        setAmount(newAmount);
+      }
+    }
+  }, [date, occurrences, todayAmount]);
+
+  function findAmount(date: Date | undefined): number {
+    if (!date) return 0;
+
+    const selectedDate = formatLocalDate(date);
     const day = occurrences.find((day) => day?.date === selectedDate);
-    return day ? day.amount : 0;
+    return day?.amount ?? 0;
   }
 
-  function handleSelect(date: Date | undefined) {
-    setDate(date);
-    setAmount(findAmount(date));
+  function handleSelect(selectedDate: Date | undefined) {
+    setDate(selectedDate);
   }
 
   return (
-    <>
+    <div className="flex w-full flex-col items-center gap-4">
       <Calendar
         mode="single"
         occurrences={occurrences}
@@ -34,16 +52,18 @@ export default function Picker({ occurrences }: PickerProps) {
         onSelect={handleSelect}
         className="w-full"
       />
-      <Card>
+      <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Ile płaska Hanka wtedy?</CardTitle>
+          <CardTitle>
+            Ile płaska Hanka {date ? formatLocalDate(date) : "wtedy"}?
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <h2 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+          <h2 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
             {amount}
           </h2>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }

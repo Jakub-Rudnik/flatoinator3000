@@ -1,43 +1,11 @@
+// src/components/counter.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { pusherClient } from "@/lib/pusher";
+import { useCounter } from "@/lib/counter-context";
 
-type CounterProps = {
-  initialAmount: number;
-};
-
-export default function Counter({ initialAmount }: CounterProps) {
-  const [amount, setAmount] = useState(initialAmount);
-
-  useEffect(() => {
-    const channel = pusherClient.subscribe("counter-channel");
-
-    channel.bind("counter-update", (data: { amount: number }) => {
-      setAmount(data.amount);
-    });
-
-    return () => {
-      pusherClient.unsubscribe("counter-channel");
-    };
-  }, []);
-
-  const handleClick = async () => {
-    try {
-      const response = await fetch("/api/socket", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action: "increment" }),
-      });
-
-      // The UI will update via Pusher
-    } catch (error) {
-      console.error("Failed to increment:", error);
-    }
-  };
+export default function Counter() {
+  const { amount, incrementCounter } = useCounter();
 
   return (
     <>
@@ -46,7 +14,7 @@ export default function Counter({ initialAmount }: CounterProps) {
       </h2>
       <Button
         size="lg"
-        onClick={handleClick}
+        onClick={incrementCounter}
         className="bg-[url(/wood.webp)] bg-cover bg-center text-white"
       >
         Wypłaszcz
