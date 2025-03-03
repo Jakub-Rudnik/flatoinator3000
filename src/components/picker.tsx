@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar } from "@/components/ui/calendar";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { day } from "@/server/db/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatLocalDate } from "@/lib/utils";
@@ -16,6 +16,17 @@ export default function Picker({ occurrences }: PickerProps) {
   const [amount, setAmount] = useState<number>(0);
   const { amount: todayAmount } = useCounter();
 
+  const findAmount = useCallback(
+    (date: Date | undefined): number => {
+      if (!date) return 0;
+
+      const selectedDate = formatLocalDate(date);
+      const day = occurrences.find((day) => day?.date === selectedDate);
+      return day?.amount ?? 0;
+    },
+    [occurrences],
+  );
+
   useEffect(() => {
     if (date) {
       // If today's date is selected, use the shared counter value
@@ -29,15 +40,7 @@ export default function Picker({ occurrences }: PickerProps) {
         setAmount(newAmount);
       }
     }
-  }, [date, occurrences, todayAmount]);
-
-  function findAmount(date: Date | undefined): number {
-    if (!date) return 0;
-
-    const selectedDate = formatLocalDate(date);
-    const day = occurrences.find((day) => day?.date === selectedDate);
-    return day?.amount ?? 0;
-  }
+  }, [date, findAmount, occurrences, todayAmount]);
 
   function handleSelect(selectedDate: Date | undefined) {
     setDate(selectedDate);
