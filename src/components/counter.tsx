@@ -3,9 +3,22 @@
 
 import { Button } from "@/components/ui/button";
 import { useCounter } from "@/lib/counter-context";
+import { useState } from "react";
 
 export default function Counter() {
-  const { amount, debouncedIncrement } = useCounter();
+  const { amount, incrementCounter } = useCounter();
+  const [isIncrementing, setIsIncrementing] = useState(false);
+
+  const handleClick = async () => {
+    if (isIncrementing) return;
+
+    setIsIncrementing(true);
+    try {
+      await incrementCounter();
+    } finally {
+      setIsIncrementing(false);
+    }
+  };
 
   return (
     <>
@@ -14,7 +27,8 @@ export default function Counter() {
       </h2>
       <Button
         size="lg"
-        onClick={debouncedIncrement}
+        onClick={handleClick}
+        disabled={isIncrementing}
         className="bg-[url(/wood.webp)] bg-cover bg-center text-white"
       >
         Wypłaszcz

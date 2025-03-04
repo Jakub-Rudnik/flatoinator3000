@@ -4,17 +4,15 @@
 import {
   createContext,
   ReactNode,
-  useCallback,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import { pusherClient } from "@/lib/pusher";
 
 interface CounterContextType {
   amount: number;
-  debouncedIncrement: () => void;
+  incrementCounter: () => Promise<void>;
 }
 
 const CounterContext = createContext<CounterContextType | null>(null);
@@ -43,22 +41,7 @@ export function CounterProvider({
     };
   }, []);
 
-  function clientDebounce<T extends (...args: never[]) => void>(
-    fn: T,
-    delay: number,
-  ): (...args: Parameters<T>) => void {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: Parameters<T>) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => fn(...args), delay);
-    };
-  }
-
-  // lib/counter-context.tsx
   const incrementCounter = async () => {
-    // Optimistic update - immediately update the UI
-    setAmount((prev) => prev + 1);
-
     try {
       const response = await fetch("/api/socket", {
         method: "POST",
@@ -81,21 +64,8 @@ export function CounterProvider({
     }
   };
 
-  const incrementCounterRef = useRef(incrementCounter);
-  useEffect(() => {
-    incrementCounterRef.current = incrementCounter;
-  }, []);
-
-  // Create a debounced version that always uses the current implementation
-  const debouncedIncrement = useCallback(() => {
-    const debouncedFn = clientDebounce(async () => {
-      await incrementCounterRef.current();
-    }, 200);
-    debouncedFn();
-  }, []);
-
   return (
-    <CounterContext.Provider value={{ amount, debouncedIncrement }}>
+    <CounterContext.Provider value={{ amount, incrementCounter }}>
       {children}
     </CounterContext.Provider>
   );
