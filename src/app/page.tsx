@@ -1,9 +1,9 @@
 import { db } from "@/server/db";
-import { days } from "@/server/db/schema";
 import Counter from "@/components/counter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Picker from "@/components/picker";
 import { CounterProvider } from "@/lib/counter-context";
+import { LinearChart } from "@/components/linear-chart";
 
 export const dynamic = "force-dynamic";
 
@@ -13,24 +13,24 @@ export default async function HomePage() {
   const occurrences = await db.query.days.findMany();
 
   const todayDate = new Date().toISOString().split("T")[0]!;
-  let day = await db.query.days.findFirst({
-    where: (days, { eq }) => eq(days.date, todayDate),
+  const clicks = await db.query.clicks.findMany({
+    where: (clicks, { sql }) => sql`DATE(
+        ${clicks.createdAt}
+        )
+        =
+        ${todayDate}`,
   });
 
-  if (!day) {
-    const inserted = await db
-      .insert(days)
-      .values({
-        amount: 0,
-        date: todayDate,
-      })
-      .returning();
-    day = inserted[0];
-  }
+  const formattedClicks = clicks.map((click) => click.createdAt?.getUTCHours());
+
+  const chartData = Array.from({ length: 24 }, (_, i) => ({
+    hour: i.toString(),
+    amount: formattedClicks.filter((hour) => hour === i).length,
+  }));
 
   return (
     <main className="flex w-full flex-col items-center justify-start">
-      <CounterProvider initialAmount={day!.amount}>
+      <CounterProvider initialAmount={clicks.length}>
         <Tabs
           className="flex w-full flex-col items-center justify-center pt-5"
           defaultValue="today"
@@ -45,6 +45,7 @@ export default async function HomePage() {
                 Ile Hanka płaska dzisiaj?
               </h1>
               <Counter />
+              <LinearChart data={chartData} />
             </div>
           </TabsContent>
           <TabsContent value="history">

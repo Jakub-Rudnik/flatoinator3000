@@ -1,7 +1,5 @@
-// src/app/api/socket/route.ts
 import { db } from "@/server/db";
-import { days } from "@/server/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { clicks } from "@/server/db/schema";
 import { pusherServer } from "@/lib/pusher-server";
 
 type RequestBody = {
@@ -12,33 +10,25 @@ function today() {
   return new Date().toISOString().split("T")[0];
 }
 
-// api/socket/route.ts
 export async function POST(req: Request) {
   try {
     const { action } = (await req.json()) as RequestBody;
 
     if (action === "increment") {
-      // Use a more efficient update query
-      const result = await db.transaction(async (tx) => {
-        // Update and return the new value in a single operation
-        const [updated] = await tx
-          .update(days)
-          .set({
-            amount: sql`amount
-                        + 1`,
-          })
-          .where(eq(days.date, today()!))
-          .returning({ amount: days.amount });
-
-        return updated;
+      await db.insert(clicks).values({});
+      const result = await db.query.clicks.findMany({
+        where: (clicks, { sql }) => sql`DATE(
+                ${clicks.createdAt}
+                )
+                =
+                ${today()}`,
       });
 
-      // Send only the updated value to Pusher
       await pusherServer.trigger("counter-channel", "counter-update", {
-        amount: result?.amount,
+        amount: result.length,
       });
 
-      return Response.json({ success: true, amount: result?.amount });
+      return Response.json({ success: true, error: null });
     }
 
     return Response.json(

@@ -35,3 +35,14 @@ export const days = createTable("days", {
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const clicks = createTable("clicks", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  createdAt: timestamp("created_at", {
+    mode: "date",
+    withTimezone: true,
+  }).default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+});

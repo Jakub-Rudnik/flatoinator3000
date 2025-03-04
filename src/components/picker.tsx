@@ -29,7 +29,6 @@ export default function Picker({ occurrences }: PickerProps) {
 
   useEffect(() => {
     if (date) {
-      // If today's date is selected, use the shared counter value
       const todayDate = formatLocalDate(new Date());
       const selectedDate = formatLocalDate(date);
 

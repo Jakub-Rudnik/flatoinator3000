@@ -53,12 +53,10 @@ export function CounterProvider({
       });
 
       if (!response.ok) {
-        // Revert on error
         setAmount((prev) => prev - 1);
         console.error("Server error:", await response.text());
       }
     } catch (error) {
-      // Revert on error
       setAmount((prev) => prev - 1);
       console.error("Failed to increment:", error);
     }
