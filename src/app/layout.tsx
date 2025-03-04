@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ModeToggle } from "@/components/theme-toggle";
 
 export const metadata: Metadata = {
   title: "Flatoinator3000",
@@ -27,15 +28,19 @@ export default function RootLayout({
           enableColorScheme={true} // Explicitly enable color scheme
         >
           {children}
-          <footer className="w-full border-t-2 p-4 text-center">
-            Built by Jakub Rudnik. Source code on{" "}
-            <a
-              className="font-medium text-primary underline underline-offset-4"
-              href="https://github.com/Jakub-Rudnik/flatoinator3000"
-              target="_blank"
-            >
-              github
-            </a>
+          <footer className="flex w-full items-center justify-center gap-5 border-t-2 p-4 text-center">
+            <span>
+              {" "}
+              Built by Jakub Rudnik. Source code on{" "}
+              <a
+                className="font-medium text-primary underline underline-offset-4"
+                href="https://github.com/Jakub-Rudnik/flatoinator3000"
+                target="_blank"
+              >
+                github
+              </a>
+            </span>
+            <ModeToggle />
           </footer>
         </ThemeProvider>
       </body>
