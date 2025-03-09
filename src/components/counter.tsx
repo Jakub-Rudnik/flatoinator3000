@@ -1,11 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useCounter } from "@/lib/counter-context";
+import { useAppState } from "@/lib/state-context";
 import { useState } from "react";
 
 export default function Counter() {
-  const { amount, incrementCounter } = useCounter();
+  const { amount, incrementCounter } = useAppState();
   const [isIncrementing, setIsIncrementing] = useState(false);
 
   const handleClick = async () => {

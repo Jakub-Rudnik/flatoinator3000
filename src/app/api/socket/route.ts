@@ -7,7 +7,9 @@ type RequestBody = {
 };
 
 function today() {
-  return new Date().toISOString().split("T")[0];
+  return new Date().toLocaleString("en-PL", {
+    timeZone: "Europe/Warsaw",
+  });
 }
 
 export async function POST(req: Request) {
@@ -24,8 +26,9 @@ export async function POST(req: Request) {
                 ${today()}`,
       });
 
-      await pusherServer.trigger("counter-channel", "counter-update", {
+      await pusherServer.trigger("state-channel", "state-update", {
         amount: result.length,
+        clicks: result,
       });
 
       return Response.json({ success: true, error: null });
