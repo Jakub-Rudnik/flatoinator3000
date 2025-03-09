@@ -2,7 +2,7 @@
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
 import {sql} from "drizzle-orm";
-import {date, integer, pgTableCreator, timestamp} from "drizzle-orm/pg-core";
+import {integer, pgTableCreator, timestamp} from "drizzle-orm/pg-core";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -11,38 +11,21 @@ import {date, integer, pgTableCreator, timestamp} from "drizzle-orm/pg-core";
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
 
-export type day =
-  | {
-      id: number;
-      date: string;
-      amount: number;
-      createdAt: Date | null;
-      updatedAt: Date;
-    }
-  | undefined;
+export type click = {
+  id: number;
+  createdAt: Date | null;
+  updatedAt: Date;
+};
 
 export const createTable = pgTableCreator((name) => `flatoinator3000_${name}`);
-
-export const days = createTable("days", {
-  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  amount: integer("amount").notNull(),
-  date: date("date").notNull(),
-  createdAt: timestamp("created_at", {
-    mode: "date",
-    withTimezone: true,
-  }).default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP`),
-});
 
 export const clicks = createTable("clicks", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
   createdAt: timestamp("created_at", {
     mode: "date",
     withTimezone: true,
-  }).default(sql`CURRENT_TIMESTAMP`),
+  }).default(sql`CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw'`),
   updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`),
+    .default(sql`CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw'`),
 });
