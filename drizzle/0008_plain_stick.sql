@@ -1,0 +1,1 @@
+ALTER TABLE "flatoinator3000_clicks" ADD COLUMN "counter_id" integer NOT NULL;
