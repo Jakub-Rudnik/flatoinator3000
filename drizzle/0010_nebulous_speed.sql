@@ -1,0 +1,1 @@
+ALTER TABLE "flatoinator3000_counters" ADD COLUMN "description" varchar NOT NULL;

@@ -35,6 +35,7 @@ export const clicks = createTable("clicks", {
 export const counters = createTable("counters", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
   name: varchar("name").notNull(),
+  description: varchar("description").notNull(),
   createdAt: timestamp("created_at", {
     mode: "date",
     withTimezone: true,
