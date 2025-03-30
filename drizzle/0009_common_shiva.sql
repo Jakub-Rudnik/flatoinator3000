@@ -1,0 +1,1 @@
+ALTER TABLE "flatoinator3000_clicks" ALTER COLUMN "user_id" SET DATA TYPE varchar;
