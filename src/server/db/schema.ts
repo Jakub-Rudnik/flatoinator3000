@@ -1,8 +1,8 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import {sql} from "drizzle-orm";
-import {integer, pgTableCreator, timestamp, varchar,} from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { integer, pgTableCreator, timestamp, varchar, } from "drizzle-orm/pg-core";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -21,7 +21,7 @@ export const createTable = pgTableCreator((name) => `flatoinator3000_${name}`);
 
 export const clicks = createTable("clicks", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  userId: integer("user_id").notNull(),
+  userId: varchar("user_id").notNull(),
   counterId: integer("counter_id").notNull(),
   createdAt: timestamp("created_at", {
     mode: "date",
