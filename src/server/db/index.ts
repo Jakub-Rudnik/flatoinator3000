@@ -1,18 +1,30 @@
-import {drizzle} from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import * as schema from './schema';
 
-import {env} from "@/env";
-import * as schema from "./schema";
+declare global {
+    var cachedConnection: postgres.Sql | undefined;
+}
 
-/**
- * Cache the database connection in development. This avoids creating a new connection on every HMR
- * update.
- */
-const globalForDb = globalThis as unknown as {
-    conn: postgres.Sql | undefined;
-};
+let sqlClient: postgres.Sql;
 
-const conn = globalForDb.conn ?? postgres(env.DATABASE_URL);
-if (env.NODE_ENV !== "production") globalForDb.conn = conn;
+if (process.env.NODE_ENV === 'production') {
+    sqlClient = postgres(process.env.DATABASE_URL!, {
+        max: 10,
+        idle_timeout: 20,
+        connect_timeout: 10,
+        ssl: { require: true },
+    });
+} else {
+    if (!global.cachedConnection) {
+        global.cachedConnection = postgres(process.env.DATABASE_URL!, {
+            max: 10,
+            idle_timeout: 20,
+            connect_timeout: 10,
+            ssl: { require: true },
+        });
+    }
+    sqlClient = global.cachedConnection;
+}
 
-export const db = drizzle(conn, {schema});
+export const db = drizzle(sqlClient, { schema });
