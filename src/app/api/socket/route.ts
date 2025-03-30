@@ -1,9 +1,10 @@
 import { db } from "@/server/db";
 import { clicks } from "@/server/db/schema";
 import { pusherServer } from "@/lib/pusher-server";
+import { auth } from "@clerk/nextjs/server";
 
 type RequestBody = {
-  action: string;
+  counterId: number;
 };
 
 function today() {
@@ -13,36 +14,33 @@ function today() {
 }
 
 export async function POST(req: Request) {
-  try {
-    const { action } = (await req.json()) as RequestBody;
+  const { counterId } = (await req.json()) as RequestBody;
+  const { userId } = await auth();
 
-    if (action === "increment") {
-      await db.insert(clicks).values({});
-      const result = await db.query.clicks.findMany({
-        where: (clicks, { sql }) => sql`DATE(
-                ${clicks.createdAt}
-                )
-                =
-                ${today()}`,
+  if (userId && counterId) {
+    try {
+      await db.insert(clicks).values({
+        userId: userId,
+        counterId: counterId,
       });
 
-      await pusherServer.trigger("state-channel", "state-update", {
-        amount: result.length,
-        clicks: result,
+      await pusherServer.trigger(`counter-${counterId}`, "update", {
+        action: "update"
       });
 
       return Response.json({ success: true, error: null });
-    }
 
-    return Response.json(
-      { success: false, error: "Invalid action" },
-      { status: 400 },
-    );
-  } catch (error) {
-    console.error(error);
-    return Response.json(
-      { success: false, error: "Internal server error" },
-      { status: 500 },
-    );
+    } catch (error) {
+      console.error(error);
+      return Response.json(
+        { success: false, error: "Internal server error" },
+        { status: 500 },
+      );
+    }
   }
+
+  return Response.json(
+    { success: false, error: "Provide counterId and userId" },
+    { status: 400 },
+  );
 }

@@ -7,11 +7,9 @@ import { ModeToggle } from "@/components/theme-toggle";
 import {
   ClerkProvider,
   SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
   UserButton,
 } from "@clerk/nextjs";
+import Navigation from "@/components/navigation";
 
 export const metadata: Metadata = {
   title: "Flatoinator3000",
@@ -26,7 +24,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="pl" className={GeistSans.variable} suppressHydrationWarning>
-        <body className="flex min-h-screen flex-col items-center justify-between bg-background font-sans antialiased">
+        <body className="flex min-h-screen flex-col items-center justify-between bg-background font-sans antialiased md:min-w-[768px]">
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -35,11 +33,8 @@ export default function RootLayout({
             storageKey="theme-preference"
             enableColorScheme={true}
           >
-            <header className="flex items-center justify-end gap-4 p-4">
-              <SignedOut>
-                <SignInButton />
-                <SignUpButton />
-              </SignedOut>
+            <header className="flex items-center justify-between gap-4 p-4">
+              <Navigation />
               <SignedIn>
                 <UserButton />
               </SignedIn>

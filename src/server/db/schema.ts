@@ -13,6 +13,17 @@ import { integer, pgTableCreator, timestamp, varchar, } from "drizzle-orm/pg-cor
 
 export type click = {
   id: number;
+  userId: string;
+  counterId: number;
+  createdAt: Date | null;
+  updatedAt: Date;
+};
+
+export type counter = {
+  id: number;
+  name: string;
+  description: string;
+  buttonText: string;
   createdAt: Date | null;
   updatedAt: Date;
 };
@@ -36,6 +47,7 @@ export const counters = createTable("counters", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
   name: varchar("name").notNull(),
   description: varchar("description").notNull(),
+  buttonText: varchar("button_text").notNull(),
   createdAt: timestamp("created_at", {
     mode: "date",
     withTimezone: true,

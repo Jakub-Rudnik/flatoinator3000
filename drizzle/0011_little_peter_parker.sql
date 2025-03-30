@@ -1,0 +1,1 @@
+ALTER TABLE "flatoinator3000_counters" ADD COLUMN "button_text" varchar NOT NULL;
