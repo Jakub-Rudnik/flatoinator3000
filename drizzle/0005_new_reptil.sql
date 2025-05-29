@@ -1,2 +1,0 @@
-ALTER TABLE "flatoinator3000_clicks" ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw';--> statement-breakpoint
-ALTER TABLE "flatoinator3000_clicks" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw';

@@ -1,1 +1,0 @@
-ALTER TABLE "flatoinator3000_days" ALTER COLUMN "date" SET DATA TYPE timestamp;
