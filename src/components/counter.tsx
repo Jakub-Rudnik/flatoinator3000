@@ -4,23 +4,21 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { SignInButton, useUser } from "@clerk/nextjs";
 import { Doc, Id } from "convex/_generated/dataModel";
-import { useMutation, useQuery } from "convex/react";
+import { Preloaded, useMutation, usePreloadedQuery, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 
 export type CounterWithClick = Doc<"counters"> & {
-  clicks: number;
-}
+  clicks: Preloaded<typeof api.clicks.getTodaysClicks>;
+};
 
 interface CounterProps {
-  _id: Id<"counters">;
-  name: string;
-  description: string;
-  buttonText: string;
+  counterData: CounterWithClick;
 }
 
-export default function Counter({ _id, name, description, buttonText }: CounterProps) {
-  const { isSignedIn } = useUser();
-  const clicks = useQuery(api.clicks.getTodaysClicks, { counterId: _id });
+export default function Counter({ counterData }: CounterProps) {
+  const { isSignedIn, isLoaded } = useUser();
+  const { _id, name, description, buttonText } = counterData;
+  const clicks = usePreloadedQuery(counterData.clicks);
   const mutateClicks = useMutation(api.clicks.addClick);
 
   function handleClick() {
@@ -35,13 +33,13 @@ export default function Counter({ _id, name, description, buttonText }: CounterP
       <p className="text-center text-sm text-muted-foreground">
         {name}
       </p>
-      <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
+      <h2 className="scroll-m-20 text-center text-xl font-extrabold tracking-tight lg:text-2xl">
         {description}
-      </h1>
-      <h2 className="scroll-m-20 pb-2 text-5xl font-semibold tracking-tight first:mt-0">
-        {clicks ? clicks.length : 0}
       </h2>
-      {isSignedIn ? (
+      <h3 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+        {clicks ? clicks.length : 0}
+      </h3>
+      {isSignedIn && isLoaded && (
         <Button
           onClick={() => handleClick()}
           size="lg"
@@ -49,11 +47,6 @@ export default function Counter({ _id, name, description, buttonText }: CounterP
         >
           {buttonText}
         </Button>
-      ) : (
-        <SignInButton mode="modal">
-          <Button size="lg" >
-            Zaloguj się</Button>
-        </SignInButton>
       )}
     </div>
   );
